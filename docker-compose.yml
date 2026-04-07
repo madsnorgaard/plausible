@@ -43,6 +43,11 @@ services:
       - "traefik.http.routers.plausible.tls.certresolver=lets-encrypt"
       - "traefik.http.services.plausible.loadbalancer.server.port=8000"
       - "traefik.docker.network=web"
+      # CSP for Plausible dashboard (Phoenix LiveView needs ws/wss + unsafe-eval)
+      - "traefik.http.middlewares.plausible-headers.headers.contentSecurityPolicy=default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' ws: wss:; frame-ancestors 'self'; base-uri 'self'; upgrade-insecure-requests"
+      # Fix CORS conflict: strip credentials header (wildcard origin + credentials is invalid)
+      - "traefik.http.middlewares.plausible-headers.headers.customResponseHeaders.Access-Control-Allow-Credentials="
+      - "traefik.http.routers.plausible.middlewares=plausible-headers"
 
   plausible_exporter:
     image: ghcr.io/riesinger/plausible-exporter:latest
