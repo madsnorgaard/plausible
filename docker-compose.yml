@@ -52,12 +52,18 @@ services:
   plausible_exporter:
     image: ghcr.io/riesinger/plausible-exporter:latest
     restart: unless-stopped
-    ports:
-      - "127.0.0.1:9877:9877"
+    # Scraped by Prometheus over the shared 'web' network as plausible_exporter:9877.
+    # No host port: it previously published 127.0.0.1:9877 (loopback only, unreachable
+    # from containers) and VPS2 ufw blocks container->host on internal ports anyway.
+    # NOTE: still requires PLAUSIBLE_API_KEY in .env or the exporter crash-loops
+    # ("config: no plausible token provided"). Generate it in Plausible UI > Settings > API Keys.
     environment:
       PLAUSIBLE_HOST: http://plausible:8000
       PLAUSIBLE_TOKEN: ${PLAUSIBLE_API_KEY}
       PLAUSIBLE_SITE_IDS: ${PLAUSIBLE_SITE_IDS}
+    networks:
+      - default
+      - web
     labels:
       - "traefik.enable=false"
 
