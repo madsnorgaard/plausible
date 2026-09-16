@@ -10,7 +10,7 @@ services:
       - "traefik.enable=false"
 
   plausible_events_db:
-    image: clickhouse/clickhouse-server:24.3.3.102-alpine
+    image: clickhouse/clickhouse-server:26.8.6.5-alpine
     restart: unless-stopped
     volumes:
       - event_data:/var/lib/clickhouse
